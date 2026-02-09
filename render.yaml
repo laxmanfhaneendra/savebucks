@@ -1,0 +1,127 @@
+services:
+  # Combined Web + API Service
+  - type: web
+    name: savebucks-app
+    env: node
+    plan: free
+    buildCommand: npm install --include=dev && cd apps/web && npm run build
+    startCommand: cd apps/api && npm start
+    healthCheckPath: /health
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 4000
+      # Supabase Configuration
+      - key: SUPABASE_URL
+        value: https://ixkhkzjhelyumdplutbz.supabase.co
+      - key: SUPABASE_ANON_KEY
+        value: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Iml4a2hrempoZWx5dW1kcGx1dGJ6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTY0MDQ5OTMsImV4cCI6MjA3MTk4MDk5M30.T5-RXfOVOKIMstjyHuc_sEI0B-MTc9wK1BuNWdzYuPs
+      - key: SUPABASE_SERVICE_ROLE
+        value: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Iml4a2hrempoZWx5dW1kcGx1dGJ6Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc1NjQwNDk5MywiZXhwIjoyMDcxOTgwOTkzfQ.B7zXO8B2ZYpvrDTQuAWOYzUULirUWVJtNF_FAh0o-v8
+      # Affiliate Configuration
+      - key: AFF_ENABLED
+        value: "false"
+      - key: AFF_REQUIRE_APPROVED
+        value: "true"
+      - key: AMZ_ASSOC_TAG
+        value: ""
+      - key: CJ_WEBSITE_ID
+        value: ""
+      - key: CJ_DEEP_LINK_BASE
+        value: https://www.anrdoezrs.net/click
+      # Ads Configuration
+      - key: VITE_ADS_ENABLED
+        value: "false"
+      - key: VITE_ADS_PUB_ID
+        value: ca-pub-XXXXXXXXXXXXXXXX
+      - key: VITE_ADS_PLACEHOLDER
+        value: "true"
+      # Telegram Configuration
+      - key: TELEGRAM_BOT_TOKEN
+        value: 7970745711:AAEjNohzmoFLpPXzedL-9rPvG1z8Ywr8go4
+      - key: TELEGRAM_WEBHOOK_SECRET
+        value: some-long-random-string
+      - key: TELEGRAM_ALLOWED_CHANNELS
+        value: dealshunter,us_deals,tech_bargains
+      - key: TELEGRAM_MIN_TITLE_LEN
+        value: "12"
+      - key: TELEGRAM_ENABLE_IMAGES
+        value: "false"
+      # Site Configuration
+      - key: VITE_SITE_URL
+        fromService:
+          type: web
+          name: savebucks-app
+          property: host
+      - key: VITE_API_BASE
+        value: ""
+      - key: VITE_DEFAULT_IMAGE
+        value: https://dummyimage.com/1200x630/ededed/222.png&text=savebucks
+      - key: VITE_SUPABASE_URL
+        value: https://ixkhkzjhelyumdplutbz.supabase.co
+      - key: VITE_SUPABASE_ANON_KEY
+        value: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Iml4a2hrempoZWx5dW1kcGx1dGJ6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTY0MDQ5OTMsImV4cCI6MjA3MTk4MDk5M30.T5-RXfOVOKIMstjyHuc_sEI0B-MTc9wK1BuNWdzYuPs
+      - key: SITE_URL
+        fromService:
+          type: web
+          name: savebucks-app
+          property: host
+      # CORS and Security
+      - key: CORS_ORIGINS
+        fromService:
+          type: web
+          name: savebucks-app
+          property: host
+      - key: TRUST_PROXY
+        value: "true"
+      - key: JSON_LIMIT
+        value: 512kb
+      # Upstash Redis (optional - will fallback to in-memory if not set)
+      - key: UPSTASH_REDIS_REST_URL
+        value: ""
+      - key: UPSTASH_REDIS_REST_TOKEN
+        value: ""
+      # Rate Limiting Configuration
+      - key: RL_POSTS_PER_DAY
+        value: "5"
+      - key: RL_VOTES_PER_HOUR
+        value: "60"
+      - key: RL_COMMENTS_COOLDOWN_SEC
+        value: "10"
+      - key: RL_GO_PER_IP_PER_MIN
+        value: "30"
+      - key: RL_PER_DEAL_VOTE_COOLDOWN_SEC
+        value: "10"
+
+  # Telegram Worker Service
+  - type: worker
+    name: savebucks-telegram-worker
+    env: node
+    plan: free
+    buildCommand: npm install
+    startCommand: cd apps/worker && npm start
+    envVars:
+      - key: NODE_ENV
+        value: production
+      # Supabase Configuration
+      - key: SUPABASE_URL
+        value: https://ixkhkzjhelyumdplutbz.supabase.co
+      - key: SUPABASE_SERVICE_ROLE
+        value: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Iml4a2hrempoZWx5dW1kcGx1dGJ6Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc1NjQwNDk5MywiZXhwIjoyMDcxOTgwOTkzfQ.B7zXO8B2ZYpvrDTQuAWOYzUULirUWVJtNF_FAh0o-v8
+      # Telegram Configuration
+      - key: TELEGRAM_BOT_TOKEN
+        value: 7970745711:AAEjNohzmoFLpPXzedL-9rPvG1z8Ywr8go4
+      - key: TELEGRAM_WEBHOOK_SECRET
+        value: some-long-random-string
+      - key: TELEGRAM_ALLOWED_CHANNELS
+        value: dealshunter,us_deals,tech_bargains
+      - key: TELEGRAM_MIN_TITLE_LEN
+        value: "12"
+      - key: TELEGRAM_ENABLE_IMAGES
+        value: "false"
+      - key: API_BASE
+        fromService:
+          type: web
+          name: savebucks-app
+          property: host
