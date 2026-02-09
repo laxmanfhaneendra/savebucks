@@ -2,12 +2,12 @@ import React, { useState, useRef } from 'react'
 import { PhotoIcon, XMarkIcon, ArrowUpTrayIcon } from '@heroicons/react/24/outline'
 import { api } from '../../lib/api'
 
-const API_BASE = import.meta.env.VITE_API_BASE || 'http://localhost:4000'
+const API_BASE = import.meta.env.VITE_API_BASE || import.meta.env.VITE_API_URL || 'http://localhost:4000'
 
-const ImageUpload = ({ 
-  entityType, 
-  entityId, 
-  maxFiles = 5, 
+const ImageUpload = ({
+  entityType,
+  entityId,
+  maxFiles = 5,
   maxSize = 10 * 1024 * 1024, // 10MB
   onUploadComplete,
   onUploadError,
@@ -23,19 +23,19 @@ const ImageUpload = ({
 
   const handleFileSelect = (e) => {
     const files = Array.from(e.target.files)
-    
+
     // Validate files
     const validFiles = files.filter(file => {
       if (file.size > maxSize) {
         onUploadError?.(`File ${file.name} is too large. Max size is ${formatFileSize(maxSize)}.`)
         return false
       }
-      
+
       if (!file.type.startsWith('image/')) {
         onUploadError?.(`File ${file.name} is not a valid image.`)
         return false
       }
-      
+
       return true
     }).slice(0, entityType === 'company' ? 1 : maxFiles - existingImages.length)
 
@@ -44,7 +44,7 @@ const ImageUpload = ({
     }
 
     setSelectedFiles(validFiles)
-    
+
     // Create preview URLs
     const urls = validFiles.map(file => ({
       file,
@@ -52,17 +52,17 @@ const ImageUpload = ({
       name: file.name,
       size: file.size
     }))
-    
+
     setPreviewUrls(urls)
   }
 
   const removeFile = (index) => {
     const newFiles = selectedFiles.filter((_, i) => i !== index)
     const newUrls = previewUrls.filter((_, i) => i !== index)
-    
+
     // Revoke URL to free memory
     URL.revokeObjectURL(previewUrls[index].url)
-    
+
     setSelectedFiles(newFiles)
     setPreviewUrls(newUrls)
   }
@@ -76,9 +76,9 @@ const ImageUpload = ({
     try {
       console.log('🚀 Starting upload for entity:', entityType, 'ID:', entityId)
       console.log('📁 Files to upload:', selectedFiles.length)
-      
+
       let uploadResult
-      
+
       switch (entityType) {
         case 'deal':
           uploadResult = await api.uploadDealImages(entityId, selectedFiles)
@@ -155,13 +155,13 @@ const ImageUpload = ({
             className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
             disabled={uploading}
           />
-          
+
           <div className={`
             flex flex-col items-center justify-center w-full h-32 
             border-2 border-dashed rounded-lg cursor-pointer
             transition-colors duration-200
-            ${uploading 
-              ? 'border-secondary-300 bg-secondary-50 cursor-not-allowed' 
+            ${uploading
+              ? 'border-secondary-300 bg-secondary-50 cursor-not-allowed'
               : 'border-secondary-300 bg-secondary-50 hover:bg-secondary-100 hover:border-primary-400'
             }
           `}>
@@ -197,7 +197,7 @@ const ImageUpload = ({
                     className="w-full h-full object-cover"
                   />
                 </div>
-                
+
                 {!uploading && (
                   <button
                     onClick={() => removeFile(index)}
@@ -206,7 +206,7 @@ const ImageUpload = ({
                     <XMarkIcon className="w-4 h-4" />
                   </button>
                 )}
-                
+
                 <div className="mt-1 text-xs text-secondary-500 truncate">
                   {item.name}
                 </div>
@@ -216,7 +216,7 @@ const ImageUpload = ({
               </div>
             ))}
           </div>
-          
+
           {/* Upload Button */}
           <div className="flex justify-end">
             <button
@@ -251,7 +251,7 @@ const ImageUpload = ({
                     className="w-full h-full object-cover"
                   />
                 </div>
-                
+
                 {image.is_primary && (
                   <div className="absolute top-2 left-2 bg-primary-600 text-white text-xs px-2 py-1 rounded">
                     Primary

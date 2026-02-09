@@ -11,7 +11,7 @@ export function shouldShowAdsPlaceholder() {
 }
 
 export function getAffiliateLink(dealId) {
-  const baseUrl = import.meta.env.VITE_API_BASE || 'http://localhost:4000'
+  const baseUrl = import.meta.env.VITE_API_BASE || import.meta.env.VITE_API_URL || 'http://localhost:4000'
   return `${baseUrl}/go/${dealId}`
 }
 
