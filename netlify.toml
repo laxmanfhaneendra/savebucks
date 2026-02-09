@@ -1,8 +1,8 @@
 # Netlify Configuration for Savebucks Web App
 
 [build]
-  command = "npm run build"
-  publish = "dist"
+  command = "npm install && npm run -w apps/web build"
+  publish = "apps/web/dist"
 
 # SPA routing - redirect all routes to index.html
 [[redirects]]
